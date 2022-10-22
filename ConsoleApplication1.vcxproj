@@ -140,10 +140,13 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="ChatServer.cpp" />
-    <ClCompile Include="源.cpp" />
+    <ClCompile Include="Servertest.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Chat_Server.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="README.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
