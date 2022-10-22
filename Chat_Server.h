@@ -5,8 +5,6 @@
 # include <winsock.h>
 # include <conio.h>
 
-
-
 #define CHAT_MODE_UDP 1
 #define CHAT_MODE_TCP 2
 #define LISTEN_PORT_T 0x1234
