@@ -1,6 +1,4 @@
-
 # include "Chat_Server.h"
-
 
 socket_list sock_list;
 Message recv_msg;
@@ -45,6 +43,7 @@ int  ServerStart(const char* ip, unsigned short* port, const char* name, int mod
 	InitList(&sock_list);
 	FD_ZERO(&readfds);
 	FD_ZERO(&writefds);
+	FD_ZERO(&exceptfds);
 	
 	ser_addr.sin_family = AF_INET;
 	ser_addr.sin_addr.S_un.S_addr = inet_addr(ip); // 高位字节低位地址，低位字节高位地址
@@ -84,6 +83,7 @@ int  ServerStart(const char* ip, unsigned short* port, const char* name, int mod
 	{
 		//Select
 		MakeFdlist(&sock_list, &readfds);
+		MakeFdlist(&sock_list, &writefds);
 		if (select(0, &readfds, &writefds, &exceptfds, NULL) <= 0) {
 			printf("WSAGetLastError:%d", WSAGetLastError());
 			return -1;
@@ -105,7 +105,7 @@ int  ServerStart(const char* ip, unsigned short* port, const char* name, int mod
 			std::lock_guard<std::mutex> lock(input_buf_lock);
 			strcpy_s(send_msg.data, strlen(key_input_buf) + 1, key_input_buf);
 			memset(key_input_buf, 0, SENDDATA_SIZE);
-			sprintf(send_buf, "%s:\n%s\n", send_msg.name, send_msg.data);
+			sprintf_s(send_buf, "%s:\n%s\n", send_msg.name, send_msg.data);
 			//retval = sendto(s, send_buf, strlen(send_msg.name) + strlen(send_msg.data), 0,);?咋发啊，发给谁
 		}
 
@@ -155,7 +155,7 @@ int  ServerStart(const char* ip, unsigned short* port, const char* name, int mod
 				std::lock_guard<std::mutex> lock(input_buf_lock);
 				strcpy_s(send_msg.data, strlen(key_input_buf) + 1, key_input_buf);
 				memset(key_input_buf, 0, SENDDATA_SIZE);
-				sprintf(send_buf, "%s:\n%s\n", send_msg.name, send_msg.data);
+				sprintf_s(send_buf, "%s:\n%s\n", send_msg.name, send_msg.data);
 				retval = send(s, send_buf, strlen(send_msg.name) + strlen(send_msg.data), 0);
 				}
 			}
@@ -163,7 +163,6 @@ int  ServerStart(const char* ip, unsigned short* port, const char* name, int mod
 		FD_ZERO(&readfds);
 		FD_ZERO(&writefds);
 		FD_ZERO(&exceptfds);
-
 	}
 
 
@@ -220,7 +219,7 @@ void DeleteList(SOCKET s, socket_list* list) {
 	}
 }
 //Copy TCP management list 2 a fd status set
-void MakeFdlist(socket_list* list, fd_set* fd_list) {
+void MakeFdlist(socket_list* list, fd_set *fd_list) {
 	int i;
 	FD_SET(list->listen_sock_t, fd_list); //加入监听套接字
 	FD_SET(list->listen_sock_u, fd_list);
